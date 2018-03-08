@@ -1,5 +1,5 @@
 var mongoose = require('mongoose'); 
-var mongodbUri = 'mongodb://admin:admin@ds117878.mlab.com:17878/lms';
+var mongodbUri = '';
 var options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } }, 
 replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } }; 
 

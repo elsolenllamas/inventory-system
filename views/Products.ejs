@@ -38,10 +38,7 @@
 			<%= product.quantity %>
 		</div>
 		<div class="col-12 col-sm-3">
-			<form action='/add_stock' method='POST' data-product='<%- product.productname %>'>
-				<input type='hidden' name='stockproduct' value='noqui'/>
-				<button type="submit">cargar stock</button>
-			</form>
+			<a href='/add_stock/<%- product.id %>'> cargar stock</a>
 		</div>
     <% }); %>
 	</div>

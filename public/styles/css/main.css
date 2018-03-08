@@ -1,0 +1,70 @@
+.validation-message, #dashboard .validation-btc-amount, #sell-btc .validation-pesos-amount {
+  border: 1px solid #a91b0c;
+  padding: 5px 15px;
+  color: #a91b0c;
+  border-radius: 4px;
+  margin-bottom: 20px; }
+
+#dashboard .dashboard-list a {
+  display: block; }
+
+#dashboard label {
+  display: block; }
+
+#dashboard input {
+  width: 100%;
+  height: 45px; }
+
+#dashboard .cot {
+  margin-bottom: 25px; }
+
+#dashboard .confirm-transaction-btn {
+  margin-top: 25px; }
+
+#dashboard .validation-btc-amount {
+  display: none; }
+
+#sell-btc label {
+  display: block; }
+
+#sell-btc input {
+  width: 100%;
+  height: 45px; }
+
+#sell-btc .cot {
+  margin-bottom: 25px; }
+
+#sell-btc .confirm-transaction-btn {
+  margin-top: 25px; }
+
+#sell-btc .validation-pesos-amount {
+  display: none; }
+
+#history .list-header {
+  font-weight: bold;
+  border-bottom: 1px solid #e2e2e2;
+  padding: 10px 0;
+  margin-bottom: 10px; }
+
+#nav-header .nav-user {
+  float: right;
+  list-style-type: none; }
+
+#nav-header span {
+  padding: 11px 15px;
+  display: block; }
+
+#login-form input {
+  margin-bottom: 20px; }
+
+#add-product-form .title {
+  text-align: center; }
+
+#add-product-form input {
+  margin-bottom: 20px; }
+
+#register-form input {
+  margin-bottom: 20px; }
+
+#register-form button {
+  margin-bottom: 15px; }

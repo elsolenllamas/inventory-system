@@ -1,0 +1,25 @@
+<html>
+    <%- include('header', {logged: true, firstName: firstName}); %>
+    <div id="dashboard" class="container">
+        <div class="row cot">
+            <div class="col-xs-12 col-sm-12">
+                <h4>Dashboard</h4>
+            </div>
+        </div>
+        <div class="row cot">
+            <div class="col-xs-12 col-sm-4 dashboard-list">
+            	<h5> Listados </h5>
+                <a href="/list_products">Ver Productos</a>
+                <a href="/list_sales">Ver Ventas</a>
+                <a href="/list_purchases">Ver Compras</a>
+            </div>
+            <div class="col-xs-12 col-sm-4 dashboard-list">
+            	<h5> Acciones </h5>
+                <a href="/add_product">Agregar Nuevo Producto</a>
+                <a href="/add_stock_to_product">Agregar Stock a Producto</a>
+                <a href="/add_sale">Registrar Nueva Venta</a>
+                <a href="/add_purchase">Registrar Nueva Compra</a>
+            </div>
+        </div>
+    </div>
+</html>

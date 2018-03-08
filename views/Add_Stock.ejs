@@ -1,0 +1,23 @@
+<html>
+<%- include('header', {logged: true, firstName: false}); %>
+
+<div id="add-stock" class="container">
+	<div class="row">
+		<div class="col-sm-12 title">
+			<h2>Cargar Stock</h2>
+				<%= producttostock %>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-6 col-md-4 col-md-offset-4">
+			<form class='form-add-product' action='/add_product' method='POST'>
+				<input type='text', name='stockdate', class='form-control', placeholder='Fecha' required>
+				<input type='text', name='quantity', class='form-control', placeholder='Cantidad' required>
+				<input type='text', name='concepto', class='form-control', placeholder='Concepto' required>
+				<button class='btn btn-lg btn-primary btn-block' type='submit'>Agregar Producto</button>
+			<span class="clearfix"></span>
+			</form>
+		</div>
+	</div>
+</div>
+</html>

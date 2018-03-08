@@ -1,0 +1,36 @@
+{
+  "name": "lanar management system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.5.7",
+    "express": "^4.15.5",
+    "express-session": "^1.15.6",
+    "gulp": "^3.9.1",
+    "gulp-cache": "^1.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-cli": "^2.0.1",
+    "gulp-ejs": "^3.1.0",
+    "gulp-imagemin": "^4.1.0",
+    "gulp-notify": "^3.2.0",
+    "gulp-sass": "^3.1.0",
+    "method-override": "^2.3.1",
+    "mongodb": "^2.2.31",
+    "mongoose": "4.1.9",
+    "nodemon": "^1.12.1",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "passport-local": "^1.0.0",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC"
+}

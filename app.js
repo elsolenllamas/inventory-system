@@ -27,6 +27,7 @@ initPassport(passport);
 var db = require('./connection/db');
 
 var RegData = require("./models/product.js");
+var StockData = require("./models/stock.js");
 var UserData = require("./models/user.js");
 
 app.set("view engine", "ejs");
@@ -68,8 +69,8 @@ app.get("/add_product", isAuthenticated, function(req, res){
 		});
 });
 
-app.post("/add_stock", isAuthenticated, function(req, res){
-	RegData.find({ 'productname': req.body.stockproduct }, function (err, producttostock) {
+app.get("/add_stock/:id", isAuthenticated, function(req, res){
+	RegData.findById(req.params.id, function (err, producttostock) {
             if (err) {
                 return console.error(err);
             } else {
@@ -115,11 +116,55 @@ app.post("/add_product", function(req, res, next) {
         })
 });
 
+app.post("/add_stock", function(req, res, next) {
+    var concepto = req.body.concepto;
+    var quantity = req.body.quantity;
+    var id = req.body.productid;
+    var date = req.body.stockdate;
+
+    RegData.findById(id, function (err, product) { 
+        product.save(function (err) {
+            if (err) return handleError(err);
+
+            var stock = new StockData({
+                concepto: concepto,
+                quantity: quantity,
+                date: date,
+                product: product._id  
+            });
+
+            stock.save(function (err) {
+                if (err) {
+                    res.send("There was a problem adding the information to the database.");
+                } else {
+                  res.format({
+                    html: function(){
+                        res.redirect("/Stock_Saved");
+                    },
+                    json: function(){
+                        res.json(stock);
+                    }
+                });
+              }
+            });
+            product.stock.push(stock);
+            product.save();
+        });
+    });
+});
+
 app.get("/Product_Saved", function(req, res){
 	res.render("Product_Saved", {
 		text: 'Producto guardado correctamente',
 		firstName: req.user.firstName
 	});
+});
+
+app.get("/Stock_Saved", function(req, res){
+    res.render("Stock_Saved", {
+        text: 'Stock creado correctamente',
+        firstName: req.user.firstName
+    });
 });
 
 app.get("/Products", isAuthenticated, function(req, res, next){
@@ -141,6 +186,14 @@ app.get("/Products", isAuthenticated, function(req, res, next){
                 });
               }     
 	});
+});
+
+app.get("/Product_Detail", isAuthenticated, function(req, res, next){
+    RegData.find({}, function (err, products_detail) {
+    StockData.populate(products_detail, {path: "stock"},function(err, products_detail){
+            res.status(200).send(products_detail);
+        });    
+    });
 });
 
 /* Login routes */

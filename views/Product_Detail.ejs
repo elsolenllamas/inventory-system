@@ -1,0 +1,36 @@
+<html id="product-detail">
+<%- include('header', {logged: true, firstName: firstName}); %>
+<div class="container">
+	<div class="row product-detail-header">
+		<div class="col-sm-12">
+			<h2><%= product_detail.productname %></h2>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-sm-4">
+			<img class="product-image" src="../<%= product_detail.img %>"/>
+		</div>
+
+		<div class="col-sm-8">
+			<p>Stock Actual: <strong><%= product_detail.quantity %></strong></p>
+			<p>Precio: <strong>$<%= product_detail.price %></strong></p>
+		</div>
+	</div>
+	<div class="row">
+	<h5> Historial de Stock </h5>
+	<% product_detail.stock.forEach(function(product_stock) { %>
+		<div class="col-12 col-sm-4">
+			<%= product_stock.date %>
+		</div>
+		<div class="col-12 col-sm-4">
+			<%= product_stock.quantity %>
+		</div>
+		<div class="col-12 col-sm-4">
+			<%= product_stock.concepto %>
+		</div>
+    <% }); %>
+	</div>
+</div>
+</html>

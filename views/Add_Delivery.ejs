@@ -1,0 +1,55 @@
+<html>
+<%- include('header', {logged: true, firstName: false}); %>
+
+<div id="add-delivery" class="container">
+	<div class="row">
+		<div class="col-sm-12 title">
+			<h2>Realizar Entrega</h2>
+			<h4> Consignatario: <%= delivery.consigneename %></h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-8 col-md-6">
+			<form class='form-add-product' action='/add_delivery' method='POST'>
+				<input type='hidden', name='consigneeid', value='<%= delivery._id %>'. class='form-control', required>
+				<label>Fecha de entrega:</label>
+				<input type='date', name='deliverydate', class='form-control', placeholder='Fecha' required>
+				<div class="delivery-product-area">
+					<label>Productos en esta entrega:</label>
+					<div class="row delivery-product-area-clone">
+						<input type='hidden', name='productsNumber' value='productsNumber' required>
+							<div class="col-sm-5">
+								<select name="deliveryProductId" class="delivery-product-id">
+									<% products.forEach(function(product) { %>
+									<option value="<%= product._id %>">
+										<%= product.productname %>
+									</option>
+									<% }); %>
+								</select>
+							</div>
+							<div class="col-sm-3">
+								<input type='number', name='deliveryProductQuantity', class='delivery-product-quantity form-control', placeholder='Cantidad' required>
+							</div>
+							<div class="col-sm-4">
+								<input type='number', name='deliveryProductSpecialPrice', class='delivery-product-specialprice form-control', placeholder='Precio Especial' required>
+							</div>
+					</div>
+				</div>
+				<a class="delivery-add-new">Agregar otro producto</a>
+				<button class='btn btn-lg btn-primary btn-block' type='submit'>Realizar Entrega</button>
+			<span class="clearfix"></span>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+	var productsArea = document.querySelector('.delivery-product-area');
+	let index = 0;
+    document.querySelector('.delivery-add-new').addEventListener('click', function(){
+    	var productsAreaChild = document.querySelector('.delivery-product-area-clone');
+        index++;
+        var cln = productsAreaChild.cloneNode(true);
+        productsArea.appendChild(cln);
+    });
+</script>
+</html>

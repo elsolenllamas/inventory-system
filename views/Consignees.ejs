@@ -1,0 +1,43 @@
+<html>
+<%- include('header', {logged: true, firstName: firstName}); %>
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12">
+			<h2><%= title %></h2>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-sm-2">
+			<a href="/add_consignee" class="btn btn-primary">Nuevo Consignatario</a>
+		</div>
+	</div>
+</div>
+<div id="products" class="container">
+	<div class="row list-header">
+		<div class="col-12 col-sm-4">
+			Nombre
+		</div>
+		<div class="col-12 col-sm-4">
+			RUT
+		</div>
+		<div class="col-12 col-sm-4">
+			Direccion
+		</div>
+	</div>
+	<div class="registros row">
+	<% consignees.forEach(function(consignee) { %>
+		<div class="col-12 col-sm-4">
+			<a href='/consignee_detail/<%- consignee.id %>'><%= consignee.consigneename %></a>
+		</div>
+		<div class="col-12 col-sm-4">
+			<%= consignee.rut %>
+		</div>
+		<div class="col-12 col-sm-4">
+			<%= consignee.address %>
+		</div>
+    <% }); %>
+	</div>
+</div>
+</html>

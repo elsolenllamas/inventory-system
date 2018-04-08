@@ -1,0 +1,64 @@
+<html id="consignee-detail">
+<%- include('header', {logged: true, firstName: firstName}); %>
+<div class="container">
+	<div class="row consignee-detail-header">
+		<div class="col-sm-12">
+			<h2><%= consignee_detail.consigneename %></h2>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12">
+			<p>RUT: <strong><%= consignee_detail.rut %></strong></p>
+			<p>Direccion: <strong><%= consignee_detail.address %></strong></p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<h4> Inventario Actual </h4>
+			<div class="row">
+				<% consignee_detail.inventory.forEach(function(products) { %>
+					<%= products %>
+				<% }); %>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<h4> Historial de Entregas </h4>
+		<div class="row">
+			<% consignee_detail.deliveries.forEach(function(delivery) { %>
+			<div class="col-12 col-sm-12 consignee-detail-delivery-date">
+				Fecha de la Entrega: <%= delivery.deliverydate %>
+			</div>
+			<div class="row">
+				<div class="col-12 col-sm-12 consignee-detail-delivery-products">
+					<% productname.forEach(function(productinfo) { %>
+						<div class="col-12 col-sm-4">
+							<%= productinfo.product.productname %>
+						</div>
+						<div class="col-12 col-sm-4">
+							<%= productinfo.quantitydelivered %>
+						</div>
+						<div class="col-12 col-sm-4">
+							<%= productinfo.specialprice %>
+						</div>
+					<% }); %>
+				</div>	
+			</div>
+			<% }); %>
+		</div>
+		<div class="row">
+			<div class="col-12 col-sm-12">
+				<a href="/add_delivery/<%- consignee_detail.id %>">
+					Realizar Nueva Entrega
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<h4> Historial de Ventas </h4>
+	</div>
+</div>
+</html>

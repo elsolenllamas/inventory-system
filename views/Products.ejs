@@ -1,7 +1,7 @@
-<html>
+<html id="products" >
 <%- include('header', {logged: true, firstName: firstName}); %>
 <div class="container">
-	<div class="row">
+	<div class="row products-list-header">
 		<div class="col-sm-12">
 			<h2><%= title %></h2>
 		</div>
@@ -14,27 +14,35 @@
 		</div>
 	</div>
 </div>
-<div id="products" class="container">
+<div class="container">
 	<div class="row list-header">
 		<div class="col-12 col-sm-3">
 			Nombre
 		</div>
+		<div class="col-12 col-sm-3">
+			Categoria
+		</div>
 		<div class="col-12 col-sm-2">
 			Precio
 		</div>
-		<div class="col-12 col-sm-2">
+		<div class="col-12 col-sm-1">
 			Cantidad
+		</div>
+		<div class="col-12 col-sm-3">
 		</div>
 	</div>
 	<div class="registros row">
 	<% products.forEach(function(product) { %>
 		<div class="col-12 col-sm-3">
-			<%= product.productname %>
+			<a href='/product_detail/<%- product.id %>'><%= product.productname %></a>
+		</div>
+		<div class="col-12 col-sm-3">
+			<%= product.category %>
 		</div>
 		<div class="col-12 col-sm-2">
 			<%= product.price %>
 		</div>
-		<div class="col-12 col-sm-2">
+		<div class="col-12 col-sm-1">
 			<%= product.quantity %>
 		</div>
 		<div class="col-12 col-sm-3">

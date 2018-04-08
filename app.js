@@ -1,5 +1,6 @@
 var express = require('express'),
 app = express(),
+multer = require('multer'),
 path = require('path'),
 request = require('request'),
 cookieParser = require('cookie-parser');
@@ -15,6 +16,17 @@ app.use(expressSession({
 	saveUninitialized: true
 }));
 
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './public/images/products')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+
+var upload = multer({ storage: storage })
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -29,6 +41,11 @@ var db = require('./connection/db');
 var RegData = require("./models/product.js");
 var StockData = require("./models/stock.js");
 var UserData = require("./models/user.js");
+var ConsigneeData = require("./models/consignee.js");
+var DeliveryData = require("./models/delivery.js");
+var InventoryData = require("./models/inventory.js");
+var ProductsDeliveryData = require("./models/productsdelivery.js");
+var ProductsInventoryData = require("./models/productsinventory.js");
 
 app.set("view engine", "ejs");
 
@@ -69,6 +86,13 @@ app.get("/add_product", isAuthenticated, function(req, res){
 		});
 });
 
+app.get("/add_consignee", isAuthenticated, function(req, res){
+    res.render("Add_Consignee", {
+        title: 'Agregar Consignatario',
+        firstName: req.user.firstName
+        });
+});
+
 app.get("/add_stock/:id", isAuthenticated, function(req, res){
 	RegData.findById(req.params.id, function (err, producttostock) {
             if (err) {
@@ -90,14 +114,41 @@ app.get("/add_stock/:id", isAuthenticated, function(req, res){
 	});
 });
 
-app.post("/add_product", function(req, res, next) {
+app.get("/add_delivery/:id", isAuthenticated, function(req, res){
+    ConsigneeData.findById(req.params.id, function (err, delivery) {
+            RegData.find({}, function (err, products) {
+                if (err) {
+                    return console.error(err);
+                } else {
+                      res.format({
+                        html: function(){
+                            res.render("Add_Delivery", {
+                                title: 'Realizar Entrega',
+                                firstName: req.user.firstName,
+                                "delivery" : delivery,
+                                "products" : products
+                            });
+                        },
+                        json: function(){
+                            res.json(consignees);
+                        }
+                    });
+                  }  
+            });   
+    });
+});
+
+app.post("/add_product", upload.single('productimage'), function(req, res, next) {
 		var productname = req.body.productname;
-        var img = req.body.img;
         var quantity = req.body.stock;
+        var category = req.body.category;
         var price = req.body.price;
+        var img = req.file.path;
+
         RegData.create({
         	productname : productname,
-            img : img,
+            img: img,
+            category : category,
             quantity : quantity,
             price : price
         }, function (err, product) {
@@ -148,9 +199,117 @@ app.post("/add_stock", function(req, res, next) {
               }
             });
             product.stock.push(stock);
+            var newQuantity = product.quantity + stock.quantity;
+            product.quantity = newQuantity;
             product.save();
         });
     });
+});
+
+app.post("/add_delivery", function(req, res, next) {
+    var deliverydate = req.body.deliverydate;
+    var id = req.body.consigneeid;
+
+    var productsdelivered = [];
+    var productsinventory = [];
+    var productsfordelivery = [];
+    var productsforinventory = [];
+
+    for(var i = 0; i < req.body.productsNumber.length; i++) { 
+        var productId = req.body.deliveryProductId[i];
+        var productQuantity = req.body.deliveryProductQuantity[i];
+        var productSpecialPrice = req.body.deliveryProductSpecialPrice[i];
+            productsdelivered[i] = new ProductsDeliveryData({
+            product: mongoose.Types.ObjectId(productId),
+            quantitydelivered: productQuantity,
+            specialprice: productSpecialPrice
+        });
+
+        productsdelivered[i].save();
+        productsfordelivery.push(productsdelivered[i]._id);
+
+        
+        productsinventory[i] = new ProductsInventoryData({
+            product: mongoose.Types.ObjectId(productId),
+            quantityinventory: productQuantity
+        });
+
+        productsinventory[i].save();
+        productsforinventory.push(mongoose.Types.ObjectId(productsinventory[i]._id)); 
+    };
+
+    var productosInventoryArray = [];
+    for (i = 0; i < productsforinventory.length; i++) { 
+        productosInventoryArray.push(mongoose.Types.ObjectId(productsforinventory[i].product));
+    }
+    console.log(productosInventoryArray);
+
+    // ProductsDeliveryData.find({_id: {$in: productosInventoryArray}}, {path: "product"},
+    // function(err,products_to_inventory) {  
+    //     console.log(products_to_inventory)
+    // }); 
+
+    ConsigneeData.findById(id, function (err, consignee) { 
+        consignee.save(function (err) {
+            if (err) return handleError(err);
+            var delivery = new DeliveryData({
+                deliverydate: deliverydate,
+                consignee: consignee._id,
+                products: productsfordelivery
+            });
+
+            var inventory_update = new InventoryData({
+                consignee: consignee._id,
+                products: productsforinventory
+            });
+
+            inventory_update.save();
+
+            delivery.save(function (err) {
+                if (err) {
+                    res.send("There was a problem adding the information to the database.");
+                } else {
+                  res.format({
+                    html: function(){
+                        res.redirect("/Delivery_Saved");
+                    },
+                    json: function(){
+                        res.json(stock);
+                    }
+                });
+              }
+            });
+
+            consignee.inventory.push(inventory_update);
+            consignee.deliveries.push(delivery);
+            consignee.save();
+        });
+    });
+});
+
+app.post("/add_consignee", function(req, res, next) {
+        var consigneename = req.body.consigneename;
+        var consigneerut = req.body.consigneerut;
+        var consigneeaddress = req.body.consigneeaddress;
+
+        ConsigneeData.create({
+            consigneename : consigneename,
+            address: consigneeaddress,
+            rut : consigneerut
+        }, function (err, consegnee) {
+              if (err) {
+                  res.send("There was a problem adding the information to the database.");
+              } else {
+                  res.format({
+                    html: function(){
+                        res.redirect("/Consignee_Saved");
+                    },
+                    json: function(){
+                        res.json(consegnee);
+                    }
+                });
+              }
+        })
 });
 
 app.get("/Product_Saved", function(req, res){
@@ -160,9 +319,23 @@ app.get("/Product_Saved", function(req, res){
 	});
 });
 
+app.get("/Delivery_Saved", function(req, res){
+    res.render("Delivery_Saved", {
+        text: 'Entrega creada correctamente',
+        firstName: req.user.firstName
+    });
+});
+
 app.get("/Stock_Saved", function(req, res){
     res.render("Stock_Saved", {
         text: 'Stock creado correctamente',
+        firstName: req.user.firstName
+    });
+});
+
+app.get("/Consignee_Saved", function(req, res){
+    res.render("Consignee_Saved", {
+        text: 'Consignatario creado correctamente',
         firstName: req.user.firstName
     });
 });
@@ -188,11 +361,92 @@ app.get("/Products", isAuthenticated, function(req, res, next){
 	});
 });
 
-app.get("/Product_Detail", isAuthenticated, function(req, res, next){
-    RegData.find({}, function (err, products_detail) {
-    StockData.populate(products_detail, {path: "stock"},function(err, products_detail){
-            res.status(200).send(products_detail);
+app.get("/Consignees", isAuthenticated, function(req, res, next){
+    ConsigneeData.find({}, function (err, consignees) {
+            if (err) {
+                return console.error(err);
+            } else {
+                  res.format({
+                    html: function(){
+                        res.render("Consignees", {
+                            title: 'Listado de Consignatarios',
+                            firstName: req.user.firstName,
+                            "consignees" : consignees
+                        });
+                    },
+                    json: function(){
+                        res.json(products);
+                    }
+                });
+              }     
+    });
+});
+
+app.get("/product_detail/:id", isAuthenticated, function(req, res, next){
+    RegData.findById(req.params.id, function (err, product_detail) {
+    StockData.populate(product_detail, {path: "stock"},function(err, product_detail){
+            if (err) {
+                return console.error(err);
+            } else {
+                  res.format({
+                    html: function(){
+                        res.render("Product_Detail", {
+                            title: 'Detalle de Producto',
+                            firstName: req.user.firstName,
+                            "product_detail" : product_detail
+                        });
+                    },
+                    json: function(){
+                        res.json(products);
+                    }
+                });
+              } 
         });    
+    });
+});
+
+app.get("/consignee_detail/:id", isAuthenticated, function(req, res, next){
+    ConsigneeData.findById(req.params.id, function (err, consignee_detail) {
+    ConsigneeData.populate(consignee_detail, {path: "deliveries"},
+        function(err, consignee_full_detail){
+        DeliveryData.populate(consignee_full_detail,{
+            path: 'products'},function(err, consignee_full_detail){  
+
+            var productosDeliveredArray = [];
+            for (i = 0; i < consignee_full_detail.deliveries.length; i++) { 
+                var productosDelivered = consignee_full_detail.deliveries[i].products;
+                for (i = 0; i < productosDelivered.length; i++) { 
+                    productosDeliveredArray.push(mongoose.Types.ObjectId(productosDelivered[i]));
+
+                }
+            }
+
+            ProductsDeliveryData.find({_id: {$in: productosDeliveredArray}},
+            function(err,products_delivered) {  
+                ProductsDeliveryData.populate(products_delivered, {path: "product"},
+                function(err,productname) {
+                if (err) {
+                return console.error(err);
+                } else {
+                  res.format({
+                    html: function(){
+                        res.render("Consignee_Detail", {
+                            title: 'Detalle del Consignatario',
+                            firstName: req.user.firstName,
+                            "consignee_detail": consignee_full_detail,
+                            "products_delivered": products_delivered,
+                            "productname": productname
+                        });
+                    },
+                    json: function(){
+                        res.json(consignees);
+                    }
+                    });
+                } 
+                }); 
+            });  
+            }); 
+        });
     });
 });
 
@@ -218,3 +472,4 @@ app.get('/signout', function(req, res) {
 		req.logout();
 		res.redirect('/');
 });
+
